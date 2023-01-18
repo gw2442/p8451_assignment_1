@@ -1,0 +1,28 @@
+---
+title: "P8451 Assignment 1"
+output: html_document
+date: "2023-01-18"
+---
+
+```{r}
+library(tidyverse)
+library(psych)
+```
+
+## Importing and Cleaning Data
+
+```{r}
+bcdata <- read_csv("data/bcdata_Assignment1.csv") %>%
+  janitor::clean_names()
+```
+
+## Question 1
+
+Construct a table providing summaries of the quantitative features of the dataset. Summaries should include the mean, median, minimum value, and maximum value. 
+
+```{r}
+  describe(bcdata) %>%
+  knitr::kable()
+```
+
+## Question 2
