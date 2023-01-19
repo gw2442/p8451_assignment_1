@@ -89,6 +89,42 @@ ggplot(data = bcdata, (aes(x = reorder(bmi_categories, count), fill = classifica
         legend.text = element_text(size = 10))
 ```
 
+## Question 4
+
+Construct a basic regression model using breast cancer classification as the outcome and glucose, HOMA-IR, leptin, BMI (continuous) and age as the independent variables. Fill in the beta estimate and 95% confidence interval associated with a 1-unit change in HOMA-IR
+
+```{r}
+bcdata = 
+  bcdata %>%
+  mutate(
+    classification = recode(classification ,
+                            "Control" = 0,
+                            "Case" = 1)
+  ) 
+
+fit_logistic = 
+  bcdata %>%
+  glm(classification ~ glucose + homa + leptin + bmi + age, data = ., family = binomial()) %>%
+  broom::tidy()
+
+fit_logistic %>%
+  mutate(OR = exp(estimate),
+         CI_lower = exp(estimate - 1.96*std.error),
+         CI_upper = exp(estimate + 1.95*std.error)) %>%
+  select(term, estimate, OR, CI_lower, CI_upper) %>%
+  knitr::kable()
+```
+
+The beta estimate associated with a 1-unit change in HOMA-IR is 0.274. The OR is 1.315. The 95% CI is (0.939, 1.84).
+
+## Question 5 
+
+
+
+
+
+
+
 
 
 
