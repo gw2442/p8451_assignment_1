@@ -7,13 +7,15 @@ date: "2023-01-18"
 ```{r}
 library(tidyverse)
 library(psych)
+library(dplyr)
 ```
 
 ## Importing and Cleaning Data
 
 ```{r}
 bcdata <- read_csv("data/bcdata_Assignment1.csv") %>%
-  janitor::clean_names()
+  janitor::clean_names() %>%
+  drop_na()
 ```
 
 ## Question 1
@@ -26,3 +28,47 @@ Construct a table providing summaries of the quantitative features of the datase
 ```
 
 ## Question 2
+
+Recode BMI into the WHO-defined categories below:
+
+* Severely underweight - BMI less than 16.5 kg/m^2
+
+* Underweight - BMI under 18.5 kg/m^2
+
+* Normal weight - BMI greater than or equal to 18.5 to 24.9 kg/m^2
+
+* Overweight - BMI greater than or equal to 25 to 29.9 kg/m^2 
+
+* Obesity class I - BMI 30 to 34.9 kg/m^2 
+
+* Obesity class II - BMI 35 to 39.9 kg/m^2
+
+* Obesity class III - BMI greater than or equal to 40 kg/m^2 
+
+```{r}
+bcdata$bmi_categories <- as.factor( ifelse (bcdata$bmi < 16.5, 'Severely Underweight',
+                                    ifelse (bcdata$bmi < 18.5, 'Underweight',
+                                    ifelse (bcdata$bmi < 24.9, 'Normal weight',
+                                    ifelse (bcdata$bmi < 29.9, 'Overweight',
+                                    ifelse (bcdata$bmi < 34.9, 'Obesity class I',
+                                    ifelse (bcdata$bmi < 39.9, 'Obesity class II',
+                                    ifelse (bcdata$bmi < 40, 'Obesity class III'))))))))
+
+bcdata %>%
+  group_by(bmi_categories) %>%
+  summarise(n_obs = n()) %>%
+  knitr::kable()
+```
+
+## Question 3 
+
+Create a bar chart showing 
+
+
+
+
+
+
+
+
+

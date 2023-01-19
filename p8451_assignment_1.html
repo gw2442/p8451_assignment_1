@@ -384,10 +384,12 @@ pre code {
 ## The following objects are masked from &#39;package:ggplot2&#39;:
 ## 
 ##     %+%, alpha</code></pre>
+<pre class="r"><code>library(dplyr)</code></pre>
 <div id="importing-and-cleaning-data" class="section level2">
 <h2>Importing and Cleaning Data</h2>
 <pre class="r"><code>bcdata &lt;- read_csv(&quot;data/bcdata_Assignment1.csv&quot;) %&gt;%
-  janitor::clean_names()</code></pre>
+  janitor::clean_names() %&gt;%
+  drop_na()</code></pre>
 <pre><code>## Rows: 116 Columns: 10
 ## ── Column specification ────────────────────────────────────────────────────────
 ## Delimiter: &quot;,&quot;
@@ -601,6 +603,68 @@ and maximum value.</p>
 </tr>
 </tbody>
 </table>
+</div>
+<div id="question-2" class="section level2">
+<h2>Question 2</h2>
+<p>Recode BMI into the WHO-defined categories below:</p>
+<ul>
+<li><p>Severely underweight - BMI less than 16.5 kg/m^2</p></li>
+<li><p>Underweight - BMI under 18.5 kg/m^2</p></li>
+<li><p>Normal weight - BMI greater than or equal to 18.5 to 24.9
+kg/m^2</p></li>
+<li><p>Overweight - BMI greater than or equal to 25 to 29.9
+kg/m^2</p></li>
+<li><p>Obesity class I - BMI 30 to 34.9 kg/m^2</p></li>
+<li><p>Obesity class II - BMI 35 to 39.9 kg/m^2</p></li>
+<li><p>Obesity class III - BMI greater than or equal to 40
+kg/m^2</p></li>
+</ul>
+<pre class="r"><code>bcdata$bmi_categories &lt;- as.factor( ifelse (bcdata$bmi &lt; 16.5, &#39;Severely Underweight&#39;,
+                                    ifelse (bcdata$bmi &lt; 18.5, &#39;Underweight&#39;,
+                                    ifelse (bcdata$bmi &lt; 24.9, &#39;Normal weight&#39;,
+                                    ifelse (bcdata$bmi &lt; 29.9, &#39;Overweight&#39;,
+                                    ifelse (bcdata$bmi &lt; 34.9, &#39;Obesity class I&#39;,
+                                    ifelse (bcdata$bmi &lt; 39.9, &#39;Obesity class II&#39;,
+                                    ifelse (bcdata$bmi &lt; 40, &#39;Obesity class III&#39;))))))))
+
+bcdata %&gt;%
+  group_by(bmi_categories) %&gt;%
+  summarise(n_obs = n()) %&gt;%
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">bmi_categories</th>
+<th align="right">n_obs</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Normal weight</td>
+<td align="right">39</td>
+</tr>
+<tr class="even">
+<td align="left">Obesity class I</td>
+<td align="right">27</td>
+</tr>
+<tr class="odd">
+<td align="left">Obesity class II</td>
+<td align="right">12</td>
+</tr>
+<tr class="even">
+<td align="left">Overweight</td>
+<td align="right">37</td>
+</tr>
+<tr class="odd">
+<td align="left">Underweight</td>
+<td align="right">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="question-3" class="section level2">
+<h2>Question 3</h2>
+<p>Create a bar chart showing</p>
 </div>
 
 
