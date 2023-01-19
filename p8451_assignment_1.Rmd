@@ -62,7 +62,33 @@ bcdata %>%
 
 ## Question 3 
 
-Create a bar chart showing 
+Create a bar chart showing the proportion of breast cancer cases and controls within each BMI category. (That is, the graph should clearly show what % of each BMI category are cases and what % are controls)
+
+```{r}
+bcdata = 
+  bcdata %>%
+  mutate(
+    classification = recode(classification ,
+                            "1" = "Control",
+                            "2" = "Case")
+  ) 
+
+bcdata = 
+  bcdata %>%
+  group_by(bmi_categories) %>%
+  mutate(count = n()) %>%
+  mutate(bmi_categories = fct_reorder(bmi_categories, count))
+
+ggplot(data = bcdata, (aes(x = reorder(bmi_categories, count), fill = classification))) +
+  geom_bar() +
+  labs(
+    title = "Breast cancer case and control distribution within BMI categories",
+    x = "BMI categories") +
+  theme(legend.position = "bottom") +
+  theme(legend.title = element_text(size = 10),
+        legend.text = element_text(size = 10))
+```
+
 
 
 
