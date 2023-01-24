@@ -48,11 +48,11 @@ Recode BMI into the WHO-defined categories below:
 ```{r}
 bcdata$bmi_categories <- as.factor( ifelse (bcdata$bmi < 16.5, 'Severely Underweight',
                                     ifelse (bcdata$bmi < 18.5, 'Underweight',
-                                    ifelse (bcdata$bmi < 24.9, 'Normal weight',
-                                    ifelse (bcdata$bmi < 29.9, 'Overweight',
-                                    ifelse (bcdata$bmi < 34.9, 'Obesity class I',
-                                    ifelse (bcdata$bmi < 39.9, 'Obesity class II',
-                                    ifelse (bcdata$bmi < 40, 'Obesity class III'))))))))
+                                    ifelse (bcdata$bmi < 25, 'Normal weight',
+                                    ifelse (bcdata$bmi < 30, 'Overweight',
+                                    ifelse (bcdata$bmi < 35, 'Obesity class I',
+                                    ifelse (bcdata$bmi < 40, 'Obesity class II',
+                                    'Obesity class III')))))))
 
 bcdata %>%
   group_by(bmi_categories) %>%
@@ -65,28 +65,21 @@ bcdata %>%
 Create a bar chart showing the proportion of breast cancer cases and controls within each BMI category. (That is, the graph should clearly show what % of each BMI category are cases and what % are controls)
 
 ```{r}
-bcdata = 
-  bcdata %>%
-  mutate(
-    classification = recode(classification ,
-                            "1" = "Control",
-                            "2" = "Case")
-  ) 
-
-bcdata = 
-  bcdata %>%
+bcdata %>%
   group_by(bmi_categories) %>%
-  mutate(count = n()) %>%
-  mutate(bmi_categories = fct_reorder(bmi_categories, count))
-
-ggplot(data = bcdata, (aes(x = reorder(bmi_categories, count), fill = classification))) +
-  geom_bar() +
+  mutate(n = n(),
+         cases = sum(classification - 1),
+         proportion_cases = cases / n) %>%
+  ggplot(aes(x = reorder(bmi_categories, proportion_cases), fill = factor(classification))) +
+  geom_bar(position = "fill") +
   labs(
     title = "Breast cancer case and control distribution within BMI categories",
-    x = "BMI categories") +
+    x = "BMI categories",
+    y = "Proportion") +
   theme(legend.position = "bottom") +
   theme(legend.title = element_text(size = 10),
-        legend.text = element_text(size = 10))
+        legend.text = element_text(size = 10)) +
+  scale_fill_discrete(labels = c("Control", "Case"))
 ```
 
 ## Question 4
@@ -98,8 +91,8 @@ bcdata =
   bcdata %>%
   mutate(
     classification = recode(classification ,
-                            "Control" = 0,
-                            "Case" = 1)
+                            "1" = 0,
+                            "2" = 1)
   ) 
 
 fit_logistic = 
@@ -108,14 +101,13 @@ fit_logistic =
   broom::tidy()
 
 fit_logistic %>%
-  mutate(OR = exp(estimate),
-         CI_lower = exp(estimate - 1.96*std.error),
-         CI_upper = exp(estimate + 1.95*std.error)) %>%
-  select(term, estimate, OR, CI_lower, CI_upper, p.value) %>%
+  mutate(CI_lower = estimate - 1.96*std.error,
+         CI_upper = estimate + 1.96*std.error) %>%
+  select(term, estimate, CI_lower, CI_upper, p.value) %>%
   knitr::kable(digits = 3)
 ```
 
-The beta estimate associated with a 1-unit change in HOMA-IR is 0.274. The OR is 1.315. The 95% CI is (0.939, 1.849).
+The beta estimate associated with a 1-unit change in HOMA-IR is 0.274. The 95% CI for this beta estimate is (-0.063, 0.611).
 
 ## Question 5 
 
@@ -127,14 +119,13 @@ fit_linear =
 
 fit_linear %>%
   broom::tidy() %>%
-  mutate(OR = exp(estimate),
-         CI_lower = exp(estimate - 1.96*std.error),
-         CI_upper = exp(estimate + 1.96*std.error)) %>%
-  select(term, estimate, OR, CI_lower, CI_upper, p.value) %>%
+  mutate(CI_lower = estimate - 1.96*std.error,
+         CI_upper = estimate + 1.96*std.error) %>%
+  select(term, estimate, CI_lower, CI_upper, p.value) %>%
   knitr::kable(digits = 3)
 ```
 
-The beta estimate associated with a 1-unit change in age is -0.054. The OR is 0.947. The 95% CI is (0.856, 1.049). 
+The beta estimate associated with a 1-unit change in age is -0.054. The 95% CI for this beta estimate is (-0.156, 0.048). 
 
 
 
